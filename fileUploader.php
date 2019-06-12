@@ -4,7 +4,7 @@
  * 
  */
 class FileUploader {
-	private static $target_directory = "/uploads";
+	private static $target_directory = "uploads/";
 	private static $size_limit = 50000;
 	private $uploadOk = true;
 	private $file_original_name;
@@ -72,10 +72,12 @@ class FileUploader {
 		    echo "Sorry, your file was not uploaded.";
 		// if everything is ok, try to upload file
 		} else {
-		    if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], self::$target_directory)) {
+		    if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $file_original_name)) {
 		        echo "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
+		        return $file_original_name;
 		    } else {
 		        echo "Sorry, there was an error uploading your file.";
+		        return false;
 		    }
 		}
 	}

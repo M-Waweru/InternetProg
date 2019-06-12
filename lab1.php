@@ -11,11 +11,18 @@
 		$first_name = $_POST['first_name'];
 		$last_name = $_POST['last_name'];
 		$city = $_POST['city_name'];
+
 		$username = $_POST['username'];
 		$password = $_POST['password'];
-		// print_r($con);
 
-		$user = new User($first_name, $last_name, $city, $username, $password, $con);
+		$utc_timestamp = $_POST['utc_timestamp'];
+		$offset = $_POST['time_zone_offset'];
+
+		// echo $utc_timestamp;
+		// echo $offset;
+		// // print_r($con);
+
+		$user = new User($first_name, $last_name, $city, $username, $password, $utc_timestamp, $offset);
 
 		$uploader = new FileUploader;
 
@@ -26,6 +33,8 @@
 		}
 
 		$res = $user->save();
+		echo "Res: ".$res;
+		echo "<br>";
 
 		$file_upload_response = $uploader->uploadFile();
 
@@ -83,6 +92,8 @@
 				<tr class="field">
 					<td><button type="submit" name="btn_save"><strong>SAVE</strong></button></td>
 				</tr>
+				<input type="hidden" name="utc_timestamp" id="utc_timestamp" value="">
+				<input type="hidden" name="time_zone_offset" id="time_zone_offset" value="">
 				<tr class="field">
 					<td><a href="login.php">Login</a></td>
 				</tr>
@@ -90,22 +101,36 @@
 		</form>
 	</div>
 	
-<div class="usersdisplay">
+<div class="container" id="userresults">
 	<?php 
 
 	if (isset($_POST['btn_save'])){
+		echo "	<h2>User Details Table</h2>";
 		$result = $user->readAll();
-		echo "<table align='center'>";
-		echo "<thead>Display Database data</thead>";
+		echo "<table align='center' class='ui celled table'>";
+		echo "<thead>";
+		echo "<tr>";
+		echo "<th>ID</th>";
+		echo "<th>First Name</th>";
+		echo "<th>Last Name</th>";
+		echo "<th>City</th>";
+		echo "<th>Username</th>";
+		echo "<th>Password</th>";
+		echo "<th>UTC</th>";
+		echo "<th>Offset</th>";
+		echo "</tr>";
+		echo "</thead>";
 
 		while($row = mysqli_fetch_assoc($result)){
 			echo "<tr>";
-			echo "<td>".$row['id']."</td>";
-			echo "<td>".$row['first_name']."</td>";
-			echo "<td>".$row['last_name']."</td>";
-			echo "<td>".$row['user_city']."</td>";
-			echo "<td>".$row['username']."</td>";
-			echo "<td>".$row['password']."</td>";
+			echo "<td data-label='ID'>".$row['id']."</td>";
+			echo "<td data-label='First Name'>".$row['first_name']."</td>";
+			echo "<td data-label='Last Name'>".$row['last_name']."</td>";
+			echo "<td data-label='City'>".$row['user_city']."</td>";
+			echo "<td data-label='Username'>".$row['username']."</td>";
+			echo "<td data-label='Password'>".$row['password']."</td>";
+			echo "<td data-label='UTC'>".$row['utc']."</td>";
+			echo "<td data-label='Offset'>".$row['offset']."</td>";
 			echo "</tr>";
     		// echo "<br>";
 		}
@@ -116,5 +141,7 @@
  	?>
 </div>		
 </body>
+<script src="js/jquery-3.1.1.min.js"></script>
 <script type="text/javascript" src="semantic/dist/semantic.min.js"></script>
+<script type="text/javascript" src="js/timezone.js"></script>
 </html>

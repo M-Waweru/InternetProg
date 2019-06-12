@@ -9,23 +9,26 @@
 
 		private $username;
 		private $password;
-		public $con;
+		private $utc;
+		private $offset;
 
-		function __construct($first_name, $last_name, $city_name,$username,$password,$conn)
+		function __construct($first_name, $last_name, $city_name,$username,$password, $utc, $offset)
 		{
 			// print_r($conn);
-			$this->con = $conn;
+			// $this->con = $conn;
 			$this->first_name = $first_name;
 			$this->last_name = $last_name;
 			$this->city_name = $city_name;
 			$this->username = $username;
 			$this->password = $password;
+			$this->utc = $utc;
+			$this->offset = $offset;
 		}
 
-		public static function create(){
-			$instance = new self();
-			return $instance;
-		}
+		// public static function create(){
+		// 	$instance = new self();
+		// 	return $instance;
+		// }
 
 		public function setUsername($username){
 			$this->username = $username;
@@ -58,13 +61,17 @@
 			$uname = $this->username;
 			$this->hashPassword();
 			$pass = $this->password;
+			$utc = $this->utc;
+			$offset = $this->offset;
 
-			if ($this->isUserExist($uname)==false){
+			$usercheck = $this->isUserExist($uname);
+
+			if ($usercheck==true){
 				return false;
 			}
 
-			$res = mysqli_query($this->con,"INSERT INTO user(first_name, last_name, user_city,username,password) VALUES('$fn','$ln','$city','$uname','$pass')") or die ("Error ".mysqli_error($this->con));
-			return $res;
+			$res = mysql_query("INSERT INTO user(first_name, last_name, user_city,username,password,utc,offset) VALUES('$fn','$ln','$city','$uname','$pass','$utc','$offset')") or die ("Error ".mysql_error());
+			return true;
 		}
 
 		public function readAll(){
@@ -120,6 +127,7 @@
 
 			while ($row=mysqli_fetch_array($res, MYSQLI_ASSOC)){
 				if (password_verify($this->getPassword(), $row['password']) && $this->getUsername()==$row['username']){
+					$this->user_id = $row['id'];
 					$found = true;
 				}
 			}
@@ -137,6 +145,7 @@
 		public function createUserSession(){
 			session_start();
 			$_SESSION['username'] = $this->getUsername();
+			$_SESSION['userid'] = $this->user_id;
 		}
 
 		public function logout(){
@@ -149,9 +158,9 @@
 		public function isUserExist($username){
 			// print_r($this->con);
 			$sql = "SELECT * FROM user where username = ".$username.";";
-			$result = mysqli_query($this->con, $sql);
-			
-			while ($row=mysqli_fetch_array($result, MYSQLI_ASSOC)){
+			$result = mysql_query($sql);
+
+			if (!$result){
 				return false;
 			}
 			return true;
