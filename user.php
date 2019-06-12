@@ -9,14 +9,18 @@
 
 		private $username;
 		private $password;
+		private $utc;
+		private $offset;
 
-		function __construct($first_name, $last_name, $city_name,$username,$password)
+		function __construct($first_name, $last_name, $city_name,$username,$password, $utc, $offset)
 		{
 			$this->first_name = $first_name;
 			$this->last_name = $last_name;
 			$this->city_name = $city_name;
 			$this->username = $username;
 			$this->password = $password;
+			$this->utc = $utc;
+			$this->offset = $offset;
 		}
 
 		public static function create(){
@@ -55,13 +59,17 @@
 			$uname = $this->username;
 			$this->hashPassword();
 			$pass = $this->password;
+			$utc = $this->utc;
+			$offset = $this->offset;
 
-			if ($this->isUserExist($uname)==false){
+			$usercheck = $this->isUserExist($uname);
+
+			if ($usercheck==true){
 				return false;
 			}
 
-			$res = mysql_query("INSERT INTO user(first_name, last_name, user_city,username,password) VALUES('$fn','$ln','$city','$uname','$pass')") or die ("Error ".mysql_error());
-			return $res;
+			$res = mysql_query("INSERT INTO user(first_name, last_name, user_city,username,password,utc,offset) VALUES('$fn','$ln','$city','$uname','$pass','$utc','$offset')") or die ("Error ".mysql_error());
+			return true;
 		}
 
 		public function readAll(){
@@ -117,6 +125,7 @@
 
 			while ($row=mysql_fetch_array($res)){
 				if (password_verify($this->getPassword(), $row['password']) && $this->getUsername()==$row['username']){
+					$this->user_id = $row['id'];
 					$found = true;
 				}
 			}
@@ -134,6 +143,7 @@
 		public function createUserSession(){
 			session_start();
 			$_SESSION['username'] = $this->getUsername();
+			$_SESSION['userid'] = $this->user_id;
 		}
 
 		public function logout(){
@@ -146,8 +156,8 @@
 		public function isUserExist($username){
 			$sql = "SELECT * FROM user where username = ".$username.";";
 			$result = mysql_query($sql);
-			
-			while ($row=mysql_fetch_array($result)){
+
+			if (!$result){
 				return false;
 			}
 			return true;

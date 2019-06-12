@@ -34,18 +34,28 @@
  	<title>Log In</title>
  	<script type="text/javascript" src="js/validate.js"></script>
  	<link rel="stylesheet" type="text/css" href="css/validate.css">
+ 	<link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
  </head>
  <body>
- 	<form method="post" name="login" id="login" action="<?=$_SERVER['PHP_SELF']?>">
- 		<tr>
- 			<td><input type="text" name="username" placeholder="Username" required></td>
- 		</tr>
- 		 <tr>
- 			<td><input type="password" name="password" placeholder="Password" required></td>
- 		</tr>
- 		<tr>
- 			<td><button type="submit" name="btn-login"><strong>LOGIN</strong></button></td>
- 		</tr>
- 	</form>
+ 	<div class="loginform">
+ 		 <form class="ui form" method="post" name="login" id="login" action="<?=$_SERVER['PHP_SELF']?>">
+ 		 	<table align="center">
+ 		 		 <tr class="field">
+	 				<td><input type="text" name="username" placeholder="Username" required></td>
+		 		</tr>
+		 		<tr class="field">
+		 			<td><input type="password" name="password" placeholder="Password" required></td>
+		 		</tr>
+		 		<tr class="field">
+		 			<td><button type="submit" name="btn-login"><strong>LOGIN</strong></button></td>
+		 		</tr>
+		 		<tr class="field">
+					<td><a href="lab1.php">Register</a></td>
+				</tr>
+ 		 	</table>
+ 		</form>
+ 	</div>
  </body>
+ <script type="text/javascript" src="semantic/dist/semantic.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
  </html>
