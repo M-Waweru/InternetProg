@@ -2,6 +2,7 @@
 <?php 
 	include_once 'DBConnector.php';
 	include_once 'user.php';
+	include_once 'fileUploader.php';
 
 	$con = new DBConnector;
 	// print_r($con);
@@ -14,7 +15,9 @@
 		$password = $_POST['password'];
 		// print_r($con);
 
-		$user = new User($first_name, $last_name, $city, $username, $password);
+		$user = new User($first_name, $last_name, $city, $username, $password, $con);
+
+		$uploader = new FileUploader;
 
 		if (!$user->validateForm()) {
 			$user->createFormErrorSessions("All fields are required");
@@ -24,12 +27,14 @@
 
 		$res = $user->save();
 
-		if ($res) {
+		$file_upload_response = $uploader->uploadFile();
+
+		if ($res && $file_upload_response) {
 			echo "Save operation was successful";
 		} else {
 			$user->createFormErrorSessions("Username is already taken");			
-			header("Refresh:0");
-			die();
+			// header("Refresh:0");
+			// die();
 		}
 	}
  ?>
@@ -38,10 +43,11 @@
 	<title>Title goes here</title>
 	<script type="text/javascript" src="js/validate.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/validate.css">
+	<link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
 </head>
 <body>
 	<div class="userform">
-		<form name="user_details" id="user_details" onsubmit="return validateForm()" method="post" action="<?=$_SERVER['PHP_SELF'] ?>">
+		<form class="ui form" name="user_details" id="user_details" onsubmit="return validateForm()" method="post" action="<?=$_SERVER['PHP_SELF'] ?>" enctype="multipart/form-data">
 			<table align="center">
 				<tr>
 					<td>
@@ -56,25 +62,28 @@
 						</div>
 					</td>
 				</tr>
-				<tr>
+				<tr class="field">
 					<td><input type="text" name="first_name" required placeholder="First Name"> </td>
 				</tr>
-				<tr>
+				<tr class="field">
 					<td><input type="text" name="last_name" placeholder="Last Name"></td>
 				</tr>
-				<tr>
+				<tr class="field">
 					<td><input type="text" name="city_name" placeholder="City"></td>
 				</tr>
-				<tr>
+				<tr class="field">
 					<td><input type="text" name="username" placeholder="Username"></td>
 				</tr>
-				<tr>
+				<tr class="field">
 					<td><input type="password" name="password" placeholder="Password"></td>
 				</tr>
-				<tr>
+				<tr class="field">
+					<td>Profile image:<input type="file" name="fileToUpload" id="fileToUpload"></td>
+				</tr>
+				<tr class="field">
 					<td><button type="submit" name="btn_save"><strong>SAVE</strong></button></td>
 				</tr>
-				<tr>
+				<tr class="field">
 					<td><a href="login.php">Login</a></td>
 				</tr>
 		</table>
@@ -89,7 +98,7 @@
 		echo "<table align='center'>";
 		echo "<thead>Display Database data</thead>";
 
-		while($row = mysql_fetch_assoc($result)){
+		while($row = mysqli_fetch_assoc($result)){
 			echo "<tr>";
 			echo "<td>".$row['id']."</td>";
 			echo "<td>".$row['first_name']."</td>";
@@ -107,4 +116,5 @@
  	?>
 </div>		
 </body>
+<script type="text/javascript" src="semantic/dist/semantic.min.js"></script>
 </html>

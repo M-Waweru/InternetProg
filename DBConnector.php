@@ -8,12 +8,14 @@
 		public $conn;
 
 		function  __construct(){
-			$this->conn = mysql_connect(DB_SERVER, DB_USER, DB_PASS) or die("Error: ".mysql_error());
-			mysql_select_db(DB_NAME, $this->conn);
+			$this->conn = mysqli_connect(DB_SERVER, DB_USER, DB_PASS) or die("Error: ".mysqli_error($this->conn));
+			mysqli_select_db($this->conn,DB_NAME);
+			// print_r($this->conn);
+			// echo "Connected";
 		}
 
 		public function closeDatabase(){
-			mysql_close($this->conn);
+			mysqli_close($this->conn);
 			return 1;
 		}
 	}

@@ -9,9 +9,12 @@
 
 		private $username;
 		private $password;
+		public $con;
 
-		function __construct($first_name, $last_name, $city_name,$username,$password)
+		function __construct($first_name, $last_name, $city_name,$username,$password,$conn)
 		{
+			// print_r($conn);
+			$this->con = $conn;
 			$this->first_name = $first_name;
 			$this->last_name = $last_name;
 			$this->city_name = $city_name;
@@ -33,7 +36,7 @@
 		}
 
 		public function setPassword($password){
-			$this->username = $username;
+			$this->password = $password;
 		}
 
 		public function getPassword(){
@@ -60,13 +63,13 @@
 				return false;
 			}
 
-			$res = mysql_query("INSERT INTO user(first_name, last_name, user_city,username,password) VALUES('$fn','$ln','$city','$uname','$pass')") or die ("Error ".mysql_error());
+			$res = mysqli_query($this->con,"INSERT INTO user(first_name, last_name, user_city,username,password) VALUES('$fn','$ln','$city','$uname','$pass')") or die ("Error ".mysqli_error($this->con));
 			return $res;
 		}
 
 		public function readAll(){
 			$sql = "SELECT * FROM user";
-			$result = mysql_query($sql);
+			$result = mysqli_query($this->con,$sql);
 			return $result;
 		}
 
@@ -113,9 +116,9 @@
 		public function isPasswordCorrect(){
 			$con = new DBConnector;
 			$found = false;
-			$res = mysql_query("SELECT * FROM user") or die("Error".mysql_error());
+			$res = mysqli_query($this->con,"SELECT * FROM user") or die("Error".mysqli_error($this->con));
 
-			while ($row=mysql_fetch_array($res)){
+			while ($row=mysqli_fetch_array($res, MYSQLI_ASSOC)){
 				if (password_verify($this->getPassword(), $row['password']) && $this->getUsername()==$row['username']){
 					$found = true;
 				}
@@ -144,10 +147,11 @@
 		}
 
 		public function isUserExist($username){
+			// print_r($this->con);
 			$sql = "SELECT * FROM user where username = ".$username.";";
-			$result = mysql_query($sql);
+			$result = mysqli_query($this->con, $sql);
 			
-			while ($row=mysql_fetch_array($result)){
+			while ($row=mysqli_fetch_array($result, MYSQLI_ASSOC)){
 				return false;
 			}
 			return true;
